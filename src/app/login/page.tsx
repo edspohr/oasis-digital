@@ -407,7 +407,7 @@ export default function LoginPage() {
         )}
 
         <footer className="text-center text-xs text-gray-400 pt-2">
-          © 2024 Fundación Summer - OASIS Digital
+          © 2025 Fundación Summer - OASIS Digital
         </footer>
       </motion.div>
     </main>
