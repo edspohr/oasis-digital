@@ -14,17 +14,13 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  const chatHelpers = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, append, setInput } = useChat({
     api: "/api/chat",
     body: { mode },
     onError: (e: Error) => {
         console.error("Chatbot Error:", e);
     },
-  });
-  
-  console.log("ChatHelpers:", chatHelpers); // Debug log
-
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = chatHelpers;
+  } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -151,10 +147,21 @@ export function OASISChat() {
             {/* Input */}
             <div className="p-4 bg-white/80 border-t border-gray-100">
                 <form 
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
-                        console.log("Submitting chat message:", input);
-                        handleSubmit(e);
+                        if (!input.trim()) return;
+                        
+                        const msg = input;
+                        setInput(""); // Clear input immediately
+                        
+                        try {
+                           await append({
+                               role: "user",
+                               content: msg
+                           });
+                        } catch (err) {
+                            console.error("Append error:", err);
+                        }
                     }} 
                     className="flex gap-2"
                 >
