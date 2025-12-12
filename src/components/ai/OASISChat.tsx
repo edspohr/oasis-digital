@@ -14,13 +14,21 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, append, setInput } = useChat({
+  const chatResult = useChat({
     api: "/api/chat",
     body: { mode },
     onError: (e: Error) => {
         console.error("Chatbot Error:", e);
     },
-  } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  // Safe extraction with defaults
+  const messages = chatResult?.messages || [];
+  const input = chatResult?.input || "";
+  const handleInputChange = chatResult?.handleInputChange;
+  const handleSubmit = chatResult?.handleSubmit;
+  const isLoading = chatResult?.isLoading || false;
+  const error = chatResult?.error;
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -147,20 +155,10 @@ export function OASISChat() {
             {/* Input */}
             <div className="p-4 bg-white/80 border-t border-gray-100">
                 <form 
-                    onSubmit={async (e) => {
+                    onSubmit={(e) => {
                         e.preventDefault();
-                        if (!input.trim()) return;
-                        
-                        const msg = input;
-                        setInput(""); // Clear input immediately
-                        
-                        try {
-                           await append({
-                               role: "user",
-                               content: msg
-                           });
-                        } catch (err) {
-                            console.error("Append error:", err);
+                        if (handleSubmit) {
+                            handleSubmit(e);
                         }
                     }} 
                     className="flex gap-2"
