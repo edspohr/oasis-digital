@@ -14,11 +14,10 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: "/api/chat",
     body: { mode },
-  } as any) as any;
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -52,11 +51,11 @@ export function OASISChat() {
           >
             {/* Header */}
             <div className={`p-5 flex items-center justify-between ${
-                mode === 'mentor' ? 'bg-gradient-to-r from-aurora-cyan/30 to-aurora-cyan/10' : 'bg-gradient-to-r from-aurora-pink/30 to-aurora-pink/10'
+                mode === 'mentor' ? 'bg-linear-to-r from-aurora-cyan/30 to-aurora-cyan/10' : 'bg-linear-to-r from-aurora-pink/30 to-aurora-pink/10'
             }`}>
               <div className="flex items-center gap-4">
                  <div className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg ${
-                     mode === 'mentor' ? 'bg-gradient-to-br from-aurora-cyan to-teal-500 text-white' : 'bg-gradient-to-br from-aurora-pink to-rose-500 text-white'
+                     mode === 'mentor' ? 'bg-linear-to-br from-aurora-cyan to-teal-500 text-white' : 'bg-linear-to-br from-aurora-pink to-rose-500 text-white'
                  }`}>
                     {mode === 'mentor' ? <Sparkles className="h-6 w-6" /> : <Brain className="h-6 w-6" />}
                  </div>
@@ -147,7 +146,7 @@ export function OASISChat() {
                     />
                     <Button type="submit" size="icon" className={cn(
                         "rounded-full shrink-0 transition-all shadow-md h-10 w-10",
-                         mode === 'mentor' ? 'bg-aurora-cyan hover:bg-aurora-cyan/80' : 'bg-aurora-pink hover:bg-aurora-pink/80'
+                         mode === 'mentor' ? 'bg-linear-to-br from-aurora-cyan to-teal-500 hover:from-aurora-cyan/80 hover:to-teal-500/80' : 'bg-linear-to-br from-aurora-pink to-rose-500 hover:from-aurora-pink/80 hover:to-rose-500/80'
                     )}>
                         <Send className="h-4 w-4 text-white" />
                     </Button>
@@ -159,7 +158,7 @@ export function OASISChat() {
 
       {/* Welcome Tooltip */}
       <AnimatePresence>
-        {showTooltip && !isOpen && (
+        {showTooltip && (
           <motion.div
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -167,7 +166,7 @@ export function OASISChat() {
             className="absolute bottom-20 right-0 bg-white rounded-2xl shadow-xl p-4 w-64 border border-gray-100"
           >
             <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-aurora-cyan to-aurora-pink flex items-center justify-center shrink-0">
+              <div className="h-10 w-10 rounded-full bg-linear-to-br from-aurora-cyan to-aurora-pink flex items-center justify-center shrink-0">
                 <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -187,13 +186,13 @@ export function OASISChat() {
         whileTap={{ scale: 0.95 }}
         className={cn(
           "h-20 w-20 rounded-full shadow-2xl flex items-center justify-center relative overflow-hidden",
-          "bg-gradient-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow",
+          "bg-linear-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow",
           "ring-4 ring-white/50"
         )}
       >
         {/* Pulsing animation */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow rounded-full"
+          className="absolute inset-0 bg-linear-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow rounded-full"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.7, 0, 0.7],
