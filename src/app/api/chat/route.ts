@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         messages,
       });
 
-      return result.toTextStreamResponse();
+      return result.toAIStreamResponse();
   } catch (error) {
     console.error("AI Error:", error);
     return new Response("Error communicating with AI service. Please check API keys.", { status: 500 });
