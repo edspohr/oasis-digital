@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function Sidebar() {
     const pathname = usePathname();
@@ -48,9 +49,6 @@ export function Sidebar() {
     return (
         <aside className="w-20 md:w-64 flex flex-col justify-between py-8 px-4 h-full relative z-20">
             <div className="space-y-8">
-import Image from "next/image";
-
-// ... inside component ...
                 <div className="flex items-center justify-center md:justify-start gap-2 px-2">
                     <Image src="/favicon.png" alt="OASIS" width={32} height={32} className="rounded-full shadow-sm" />
                     <span className="font-heading font-bold text-xl hidden md:block text-gray-800 tracking-tight">OASIS</span>

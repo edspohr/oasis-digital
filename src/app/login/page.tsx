@@ -7,6 +7,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, Loader2, User, AlertCircle, KeyRound } from "lucide-react";
+import Image from "next/image";
 
 type AuthTab = "login" | "signup" | "recovery";
 
@@ -177,9 +178,6 @@ export default function LoginPage() {
          className="glass w-full max-w-md p-8 rounded-3xl shadow-xl flex flex-col gap-6"
       >
         <div className="text-center space-y-2">
-import Image from "next/image";
-
-// ... inside component ...
             <div className="flex justify-center mb-2">
                 <Image src="/favicon.png" alt="OASIS Logo" width={80} height={80} className="h-20 w-auto" priority />
             </div>
