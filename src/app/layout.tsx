@@ -19,9 +19,11 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "OASIS Digital Portal",
-  description: "Tu refugio digital de bienestar - Fundación Summer",
+  description: "Salud Mental y Resiliencia - Fundación Summer",
   icons: {
     icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

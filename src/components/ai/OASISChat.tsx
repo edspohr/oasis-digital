@@ -5,13 +5,14 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, X, Send, Sparkles, Brain } from "lucide-react";
+import { X, Send, Sparkles, Brain, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function OASISChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
+  const [showTooltip, setShowTooltip] = useState(true);
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -27,6 +28,17 @@ export function OASISChat() {
     }
   }, [messages]);
 
+  // Hide tooltip after 8 seconds or when chat is opened
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTooltip(false), 8000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleOpenChat = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) setShowTooltip(false);
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       <AnimatePresence>
@@ -36,37 +48,36 @@ export function OASISChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="mb-4 w-[380px] h-[600px] bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            className="mb-4 w-[400px] h-[650px] bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className={`p-4 flex items-center justify-between ${
-                mode === 'mentor' ? 'bg-aurora-cyan/20' : 'bg-aurora-pink/20'
+            <div className={`p-5 flex items-center justify-between ${
+                mode === 'mentor' ? 'bg-gradient-to-r from-aurora-cyan/30 to-aurora-cyan/10' : 'bg-gradient-to-r from-aurora-pink/30 to-aurora-pink/10'
             }`}>
-              <div className="flex items-center gap-3">
-                 <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                     mode === 'mentor' ? 'bg-aurora-cyan text-white' : 'bg-aurora-pink text-white'
+              <div className="flex items-center gap-4">
+                 <div className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg ${
+                     mode === 'mentor' ? 'bg-gradient-to-br from-aurora-cyan to-teal-500 text-white' : 'bg-gradient-to-br from-aurora-pink to-rose-500 text-white'
                  }`}>
-                    {mode === 'mentor' ? <Sparkles className="h-5 w-5" /> : <Brain className="h-5 w-5" />}
+                    {mode === 'mentor' ? <Sparkles className="h-6 w-6" /> : <Brain className="h-6 w-6" />}
                  </div>
                  <div>
-                    <h3 className="font-heading font-bold text-gray-800">OASIS AI</h3>
-                    <div className="flex gap-2 text-xs font-medium">
+                    <h3 className="font-heading font-bold text-lg text-gray-800">OASIS AI</h3>
+                    <div className="flex gap-2 text-sm font-medium">
                         <button 
                             onClick={() => setMode("mentor")}
-                            className={`px-2 py-0.5 rounded-full transition-colors ${
-                                mode === 'mentor' ? 'bg-white text-aurora-cyan' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-3 py-1 rounded-full transition-all ${
+                                mode === 'mentor' ? 'bg-white shadow-sm text-aurora-cyan font-semibold' : 'text-gray-500 hover:text-gray-700'
                             }`}
                         >
-                            Mentor
+                            🌟 Mentor
                         </button>
-                        <div className="w-px bg-gray-300 h-3 self-center" />
                         <button 
                              onClick={() => setMode("coach")}
-                             className={`px-2 py-0.5 rounded-full transition-colors ${
-                                mode === 'coach' ? 'bg-white text-aurora-pink' : 'text-gray-500 hover:text-gray-700'
+                             className={`px-3 py-1 rounded-full transition-all ${
+                                mode === 'coach' ? 'bg-white shadow-sm text-aurora-pink font-semibold' : 'text-gray-500 hover:text-gray-700'
                             }`}
                         >
-                            Coach
+                            🎯 Coach
                         </button>
                     </div>
                  </div>
@@ -79,28 +90,35 @@ export function OASISChat() {
             {/* Messages */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
                 {messages.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400">
-                        {mode === 'mentor' ? (
-                            <>
-                                <Sparkles className="h-12 w-12 mb-3 opacity-50" />
-                                <p>Hola, soy tu Mentor. Estoy aquí para escucharte y apoyarte. ¿Cómo te sientes hoy?</p>
-                            </>
-                        ) : (
-                            <>
-                                <Brain className="h-12 w-12 mb-3 opacity-50" />
-                                <p>Hola, soy tu Coach. Transformemos intenciones en acciones. ¿Qué objetivo quieres atacar?</p>
-                            </>
-                        )}
+                    <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                        <div className={`h-20 w-20 rounded-full flex items-center justify-center mb-4 ${
+                            mode === 'mentor' ? 'bg-aurora-cyan/20' : 'bg-aurora-pink/20'
+                        }`}>
+                            {mode === 'mentor' ? (
+                                <Sparkles className="h-10 w-10 text-aurora-cyan" />
+                            ) : (
+                                <Brain className="h-10 w-10 text-aurora-pink" />
+                            )}
+                        </div>
+                        <h4 className="font-heading font-semibold text-lg text-gray-800 mb-2">
+                            {mode === 'mentor' ? '¡Hola! Soy tu Mentor' : '¡Hola! Soy tu Coach'}
+                        </h4>
+                        <p className="text-gray-500 text-sm max-w-xs">
+                            {mode === 'mentor' 
+                                ? 'Estoy aquí para escucharte y apoyarte en tu bienestar emocional. ¿Cómo te sientes hoy?' 
+                                : 'Transformemos intenciones en acciones concretas. ¿Qué objetivo quieres conquistar?'
+                            }
+                        </p>
                     </div>
                 )}
                 <div className="space-y-4">
                     {messages.map((m: any) => (
                         <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={cn(
-                                "max-w-[80%] rounded-2xl px-4 py-2 text-sm",
+                                "max-w-[85%] rounded-2xl px-4 py-3 text-sm",
                                 m.role === 'user' 
                                     ? "bg-gray-900 text-white rounded-br-none" 
-                                    : "bg-white border border-gray-100 shadow-sm rounded-bl-none text-gray-700"
+                                    : "bg-white border border-gray-100 shadow-md rounded-bl-none text-gray-700"
                             )}>
                                 {m.content}
                             </div>
@@ -108,10 +126,10 @@ export function OASISChat() {
                     ))}
                     {isLoading && (
                         <div className="flex justify-start">
-                             <div className="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-bl-none px-4 py-3 flex gap-1">
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                             <div className="bg-white border border-gray-100 shadow-md rounded-2xl rounded-bl-none px-4 py-3 flex gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-aurora-cyan rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                <span className="w-2.5 h-2.5 bg-aurora-pink rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                <span className="w-2.5 h-2.5 bg-aurora-yellow rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                              </div>
                         </div>
                     )}
@@ -119,16 +137,16 @@ export function OASISChat() {
             </ScrollArea>
 
             {/* Input */}
-            <div className="p-4 bg-white/50 border-t border-white">
+            <div className="p-4 bg-white/80 border-t border-gray-100">
                 <form onSubmit={handleSubmit} className="flex gap-2">
                     <Input 
                         value={input} 
                         onChange={handleInputChange} 
-                        placeholder={mode === 'mentor' ? "Cuéntame..." : "Define tu meta..."}
-                        className="rounded-full bg-white border-none shadow-sm focus-visible:ring-1 focus-visible:ring-aurora-cyan"
+                        placeholder={mode === 'mentor' ? "Cuéntame cómo te sientes..." : "¿Cuál es tu próximo objetivo?"}
+                        className="rounded-full bg-white border-gray-200 shadow-sm focus-visible:ring-2 focus-visible:ring-aurora-cyan"
                     />
                     <Button type="submit" size="icon" className={cn(
-                        "rounded-full shrink-0 transition-colors",
+                        "rounded-full shrink-0 transition-all shadow-md h-10 w-10",
                          mode === 'mentor' ? 'bg-aurora-cyan hover:bg-aurora-cyan/80' : 'bg-aurora-pink hover:bg-aurora-pink/80'
                     )}>
                         <Send className="h-4 w-4 text-white" />
@@ -139,14 +157,57 @@ export function OASISChat() {
         )}
       </AnimatePresence>
 
+      {/* Welcome Tooltip */}
+      <AnimatePresence>
+        {showTooltip && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            className="absolute bottom-20 right-0 bg-white rounded-2xl shadow-xl p-4 w-64 border border-gray-100"
+          >
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-aurora-cyan to-aurora-pink flex items-center justify-center shrink-0">
+                <Bot className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800 text-sm">¡Hola! Soy OASIS AI</p>
+                <p className="text-xs text-gray-500 mt-1">Tu asistente de bienestar mental. Haz clic para conversar.</p>
+              </div>
+            </div>
+            <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white border-r border-b border-gray-100 rotate-45" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Chat Button - More Prominent */}
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.05 }}
+        onClick={handleOpenChat}
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="h-16 w-16 rounded-full bg-black text-white shadow-xl flex items-center justify-center relative overflow-hidden group"
+        className={cn(
+          "h-20 w-20 rounded-full shadow-2xl flex items-center justify-center relative overflow-hidden",
+          "bg-gradient-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow",
+          "ring-4 ring-white/50"
+        )}
       >
-        <div className="absolute inset-0 bg-linear-to-tr from-aurora-cyan to-aurora-pink opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <MessageCircle className="h-8 w-8 relative z-10" />
+        {/* Pulsing animation */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-aurora-cyan via-aurora-pink to-aurora-yellow rounded-full"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.7, 0, 0.7],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <div className="relative z-10 flex flex-col items-center">
+          <Bot className="h-8 w-8 text-white drop-shadow-md" />
+          <span className="text-[10px] font-bold text-white mt-0.5 drop-shadow-md">AI</span>
+        </div>
       </motion.button>
     </div>
   );
