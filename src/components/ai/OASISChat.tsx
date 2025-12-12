@@ -112,7 +112,7 @@ export function OASISChat() {
                     </div>
                 )}
                 <div className="space-y-4">
-                    {messages.map((m: any) => (
+                    {messages.map((m) => (
                         <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={cn(
                                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm",
