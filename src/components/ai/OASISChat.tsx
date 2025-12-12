@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,12 +23,26 @@ export function OASISChat() {
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastMessageCountRef = useRef(0);
+
+  // Throttled auto-scroll - only scroll when new messages arrive, not during streaming
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    // Only auto-scroll when a new message is added, not during content updates
+    if (messages.length > lastMessageCountRef.current) {
+      scrollToBottom();
+      lastMessageCountRef.current = messages.length;
     }
-  }, [messages]);
+  }, [messages.length, scrollToBottom]);
 
   // Hide tooltip after 8 seconds or when chat is opened
   useEffect(() => {
@@ -90,7 +104,7 @@ export function OASISChat() {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+            <ScrollArea className="flex-1 min-h-0 p-4" ref={scrollRef}>
                 {messages.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-center p-6">
                         <div className={`h-20 w-20 rounded-full flex items-center justify-center mb-4 ${
@@ -144,14 +158,15 @@ export function OASISChat() {
                 )}
             </ScrollArea>
 
-            {/* Input */}
-            <div className="p-4 bg-white/80 border-t border-gray-100">
+            {/* Input - Fixed at bottom */}
+            <div className="p-4 bg-white/80 border-t border-gray-100 shrink-0">
                 <form onSubmit={handleSubmit} className="flex gap-2">
                     <Input 
                         value={input} 
                         onChange={handleInputChange} 
                         placeholder={mode === 'mentor' ? "Cuéntame cómo te sientes..." : "¿Cuál es tu próximo objetivo?"}
                         className="rounded-full bg-white border-gray-200 shadow-sm focus-visible:ring-2 focus-visible:ring-aurora-cyan"
+                        autoComplete="off"
                     />
                     <Button 
                         type="submit" 
