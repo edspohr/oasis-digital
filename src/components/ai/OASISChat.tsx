@@ -14,13 +14,17 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const chatHelpers = useChat({
     api: "/api/chat",
     body: { mode },
     onError: (e: Error) => {
         console.error("Chatbot Error:", e);
     },
   });
+  
+  console.log("ChatHelpers:", chatHelpers); // Debug log
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = chatHelpers;
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
