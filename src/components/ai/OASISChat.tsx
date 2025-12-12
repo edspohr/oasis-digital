@@ -137,7 +137,13 @@ export function OASISChat() {
 
             {/* Input */}
             <div className="p-4 bg-white/80 border-t border-gray-100">
-                <form onSubmit={handleSubmit} className="flex gap-2">
+                <form 
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSubmit(e);
+                    }} 
+                    className="flex gap-2"
+                >
                     <Input 
                         value={input} 
                         onChange={handleInputChange} 
