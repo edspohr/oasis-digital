@@ -1,7 +1,8 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Create response object ONCE at the start
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -13,66 +14,46 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
+        setAll(cookiesToSet) {
+          // First update the request cookies (for subsequent middleware/server code)
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
           });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
+          
+          // Then set the response cookies (for the browser)
+          // IMPORTANT: Do NOT recreate the response here - just set cookies on existing response
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
           });
         },
       },
     }
   );
 
+  // Refresh session if needed - this will call setAll if tokens are refreshed
   const {
     data: { user },
   } = await supabase.auth.getUser();
   
-  // Basic RBAC / Protection Logic
-  // Route: /admin -> Requires 'admin' role
-  // Route: /portal -> Requires logged in
-  
-  if (!user && (
-    request.nextUrl.pathname.startsWith('/participant') || 
-    request.nextUrl.pathname.startsWith('/admin') || 
-    request.nextUrl.pathname.startsWith('/collaborator')
-  )) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  // Protected routes - redirect to login if not authenticated
+  const protectedPaths = ['/participant', '/admin', '/collaborator'];
+  const isProtectedRoute = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  );
+
+  if (!user && isProtectedRoute) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
   }
-  
-  // Checking specific roles would ideally involve a DB query or Custom Claims,
-  // here we just ensure basic session presence for now. 
-  // We can expand this to check profiles tables later or use Metadata.
+
+  // Prevent logged-in users from accessing login page
+  if (user && request.nextUrl.pathname === '/login') {
+    return NextResponse.redirect(new URL('/participant', request.url));
+  }
 
   return response;
 }
@@ -84,7 +65,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * - public folder assets
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
