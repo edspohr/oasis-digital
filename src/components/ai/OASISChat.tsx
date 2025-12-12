@@ -20,7 +20,7 @@ export function OASISChat() {
     onError: (e: Error) => {
         console.error("Chatbot Error:", e);
     },
-  } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
