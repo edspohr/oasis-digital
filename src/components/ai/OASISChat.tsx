@@ -14,21 +14,13 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  const chatResult = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/chat",
     body: { mode },
     onError: (e: Error) => {
         console.error("Chatbot Error:", e);
     },
-  } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
-
-  // Safe extraction with defaults
-  const messages = chatResult?.messages || [];
-  const input = chatResult?.input || "";
-  const handleInputChange = chatResult?.handleInputChange;
-  const handleSubmit = chatResult?.handleSubmit;
-  const isLoading = chatResult?.isLoading || false;
-  const error = chatResult?.error;
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -154,15 +146,7 @@ export function OASISChat() {
 
             {/* Input */}
             <div className="p-4 bg-white/80 border-t border-gray-100">
-                <form 
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        if (handleSubmit) {
-                            handleSubmit(e);
-                        }
-                    }} 
-                    className="flex gap-2"
-                >
+                <form onSubmit={handleSubmit} className="flex gap-2">
                     <Input 
                         value={input} 
                         onChange={handleInputChange} 
@@ -172,11 +156,11 @@ export function OASISChat() {
                     <Button 
                         type="submit" 
                         size="icon" 
-                        disabled={isLoading || !input.trim()}
+                        disabled={isLoading}
                         className={cn(
                         "rounded-full shrink-0 transition-all shadow-md h-10 w-10",
                          mode === 'mentor' ? 'bg-linear-to-br from-aurora-cyan to-teal-500 hover:from-aurora-cyan/80 hover:to-teal-500/80' : 'bg-linear-to-br from-aurora-pink to-rose-500 hover:from-aurora-pink/80 hover:to-rose-500/80',
-                         (isLoading || !input.trim()) && "opacity-50 cursor-not-allowed"
+                         isLoading && "opacity-50 cursor-not-allowed"
                     )}>
                         <Send className="h-4 w-4 text-white" />
                     </Button>
