@@ -171,9 +171,14 @@ export function OASISChat() {
                         placeholder={mode === 'mentor' ? "Cuéntame cómo te sientes..." : "¿Cuál es tu próximo objetivo?"}
                         className="rounded-full bg-white border-gray-200 shadow-sm focus-visible:ring-2 focus-visible:ring-aurora-cyan"
                     />
-                    <Button type="submit" size="icon" className={cn(
+                    <Button 
+                        type="submit" 
+                        size="icon" 
+                        disabled={isLoading || !input.trim()}
+                        className={cn(
                         "rounded-full shrink-0 transition-all shadow-md h-10 w-10",
-                         mode === 'mentor' ? 'bg-linear-to-br from-aurora-cyan to-teal-500 hover:from-aurora-cyan/80 hover:to-teal-500/80' : 'bg-linear-to-br from-aurora-pink to-rose-500 hover:from-aurora-pink/80 hover:to-rose-500/80'
+                         mode === 'mentor' ? 'bg-linear-to-br from-aurora-cyan to-teal-500 hover:from-aurora-cyan/80 hover:to-teal-500/80' : 'bg-linear-to-br from-aurora-pink to-rose-500 hover:from-aurora-pink/80 hover:to-rose-500/80',
+                         (isLoading || !input.trim()) && "opacity-50 cursor-not-allowed"
                     )}>
                         <Send className="h-4 w-4 text-white" />
                     </Button>
