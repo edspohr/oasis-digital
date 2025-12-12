@@ -149,6 +149,7 @@ export function OASISChat() {
                 <form 
                     onSubmit={(e) => {
                         e.preventDefault();
+                        console.log("Submitting chat message:", input);
                         handleSubmit(e);
                     }} 
                     className="flex gap-2"
