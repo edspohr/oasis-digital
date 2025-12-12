@@ -8,8 +8,13 @@ export default function ParticipantHome() {
                     <h1 className="font-heading text-3xl font-bold text-gray-800">Mi Viaje OASIS</h1>
                     <p className="text-gray-600">Bienvenido a tu refugio digital. Aquí comienza tu camino.</p>
                  </div>
-                 <div className="bg-white/50 px-4 py-2 rounded-full border border-white text-sm font-medium text-aurora-cyan">
-                    Nivel: Explorador Empático
+                 <div className="flex items-center gap-3">
+                     <div className="bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-bold text-gray-800 flex items-center gap-2">
+                        <span className="text-yellow-500">🏆</span> 150 pts
+                     </div>
+                     <div className="bg-aurora-cyan/10 px-4 py-2 rounded-full border border-aurora-cyan/20 text-sm font-bold text-aurora-cyan-dark">
+                        Nivel: Explorador Empático
+                     </div>
                  </div>
             </div>
             

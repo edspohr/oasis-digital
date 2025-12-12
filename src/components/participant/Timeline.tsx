@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { CheckCircle2, Circle, ArrowRight, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Step {
@@ -9,6 +9,7 @@ interface Step {
   description: string;
   status: "completed" | "current" | "upcoming";
   date?: string;
+  points?: number;
 }
 
 const steps: Step[] = [
@@ -18,6 +19,7 @@ const steps: Step[] = [
     description: "Conociendo tu estado actual",
     status: "completed",
     date: "10 Oct",
+    points: 50,
   },
   {
     id: "2",
@@ -25,18 +27,28 @@ const steps: Step[] = [
     description: "Jornada presencial de inmersión",
     status: "current",
     date: "12 Oct",
+    points: 100,
   },
   {
     id: "3",
-    title: "Seguimiento 3 Meses",
-    description: "Evaluando el impacto",
+    title: "Encuesta Post Taller",
+    description: "Reflexión y feedback",
     status: "upcoming",
+    points: 75,
   },
   {
     id: "4",
+    title: "Seguimiento 3 Meses",
+    description: "Evaluando el impacto",
+    status: "upcoming",
+    points: 50,
+  },
+  {
+    id: "5", // Adjusted ID
     title: "Seguimiento 6 Meses",
     description: "Consolidando hábitos",
     status: "upcoming",
+    points: 50,
   },
 ];
 
@@ -47,6 +59,7 @@ export function Timeline() {
       
       {steps.map((step) => (
         <div key={step.id} className="relative flex items-start gap-4 group">
+            {/* ... Icon logic same as before ... */}
            <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-200">
             {step.status === "completed" ? (
               <CheckCircle2 className="h-6 w-6 text-aurora-cyan" />
@@ -73,11 +86,19 @@ export function Timeline() {
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">{step.description}</p>
                 </div>
-                {step.date && (
-                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                        {step.date}
-                    </span>
-                )}
+                <div className="flex flex-col items-end gap-1">
+                    {step.date && (
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                            {step.date}
+                        </span>
+                    )}
+                    {step.points && (
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex items-center gap-1">
+                            <Trophy className="h-3 w-3" />
+                            +{step.points} pts
+                        </span>
+                    )}
+                </div>
             </div>
             
             {step.status === "current" && (

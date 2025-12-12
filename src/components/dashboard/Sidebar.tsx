@@ -42,8 +42,6 @@ export function Sidebar() {
         { href: "/admin/events", label: "Eventos", icon: Calendar },
         { href: "/admin/participants", label: "Participantes", icon: Users },
         { href: "/admin/cms", label: "Contenidos", icon: BookOpen },
-        // Collaborator
-        { href: "/collaborator", label: "Impacto", icon: Settings },
     ];
 
     return (

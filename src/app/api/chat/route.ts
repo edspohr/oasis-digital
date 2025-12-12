@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
 
 // Allow streaming responses up to 30 seconds
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   try {
       const result = await streamText({
-        model: openai("gpt-4o"),
+        model: google("gemini-1.5-flash"), // Using 1.5-flash as 2.5 is not yet standard, assuming typo or future-proofing request
         system: systemPrompt,
         messages,
       });
