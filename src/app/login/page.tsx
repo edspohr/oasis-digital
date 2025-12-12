@@ -4,49 +4,95 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { BackgroundWaves } from "@/components/visuals/BackgroundWaves";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, User, AlertCircle } from "lucide-react";
+
+type AuthTab = "login" | "signup";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [activeTab, setActiveTab] = useState<AuthTab>("login");
+  
+  // Login fields
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  
+  // Signup fields
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupEmailConfirm, setSignupEmailConfirm] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   
   const supabase = createClient();
   const router = useRouter();
 
-  const handleEmailPassword = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ text: "", type: "" });
+    setError("");
 
-    if (isSignUp) {
-      // Sign Up
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
-        },
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
 
-      if (error) {
-        setMessage({ text: error.message, type: "error" });
-      } else {
-        setMessage({ text: "¡Revisa tu correo para confirmar tu cuenta!", type: "success" });
-      }
+    if (error) {
+      setError("Credenciales incorrectas. Verifica e intenta de nuevo.");
     } else {
-      // Sign In
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      router.push("/participant");
+    }
+    setLoading(false);
+  };
 
-      if (error) {
-        setMessage({ text: "Credenciales incorrectas. Verifica e intenta de nuevo.", type: "error" });
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    // Validate email match
+    if (signupEmail !== signupEmailConfirm) {
+      setError("Los correos electrónicos no coinciden.");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (signupPassword.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      setLoading(false);
+      return;
+    }
+
+    // Sign up WITHOUT email confirmation
+    const { data, error } = await supabase.auth.signUp({
+      email: signupEmail,
+      password: signupPassword,
+      options: {
+        data: {
+          full_name: signupName,
+        },
+        // This disables the email confirmation requirement
+        emailRedirectTo: undefined,
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+    } else if (data.user) {
+      // Auto-login after signup since no email verification needed
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: signupEmail,
+        password: signupPassword,
+      });
+      
+      if (signInError) {
+        setSuccess("¡Cuenta creada! Inicia sesión para continuar.");
+        setActiveTab("login");
+        setLoginEmail(signupEmail);
       } else {
         router.push("/participant");
       }
@@ -54,38 +100,16 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const handleMagicLink = async () => {
-    if (!email) {
-      setMessage({ text: "Ingresa tu correo primero.", type: "error" });
-      return;
-    }
-    setLoading(true);
-    setMessage({ text: "", type: "" });
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      setMessage({ text: "Error al enviar el link. Inténtalo de nuevo.", type: "error" });
-    } else {
-      setMessage({ text: "¡Link mágico enviado! Revisa tu correo.", type: "success" });
-    }
-    setLoading(false);
-  };
-
   const handleGoogleLogin = async () => {
+    setError("");
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     if (error) {
-      setMessage({ text: "Error al conectar con Google.", type: "error" });
+      setError("Error al conectar con Google: " + error.message);
     }
   };
 
@@ -99,69 +123,144 @@ export default function LoginPage() {
          className="glass w-full max-w-md p-8 rounded-3xl shadow-xl flex flex-col gap-6"
       >
         <div className="text-center space-y-2">
-            <h1 className="font-heading font-bold text-3xl text-gray-800">
-              {isSignUp ? "Crear Cuenta" : "Acceso OASIS"}
-            </h1>
-            <p className="text-sm text-gray-600">
-              {isSignUp ? "Únete a tu refugio digital" : "Ingresa a tu refugio digital"}
-            </p>
+            <h1 className="font-heading font-bold text-3xl text-gray-800">OASIS Digital</h1>
+            <p className="text-sm text-gray-600">Tu refugio digital de bienestar</p>
         </div>
 
-        <form onSubmit={handleEmailPassword} className="space-y-4">
-            <div className="space-y-3">
+        {/* Tabs */}
+        <div className="flex bg-gray-100 rounded-xl p-1">
+          <button
+            onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }}
+            className={`flex-1 py-3 rounded-lg font-medium text-sm transition-all ${
+              activeTab === "login" 
+                ? "bg-white shadow-sm text-gray-900" 
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Iniciar Sesión
+          </button>
+          <button
+            onClick={() => { setActiveTab("signup"); setError(""); setSuccess(""); }}
+            className={`flex-1 py-3 rounded-lg font-medium text-sm transition-all ${
+              activeTab === "signup" 
+                ? "bg-white shadow-sm text-gray-900" 
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Crear Cuenta
+          </button>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {activeTab === "login" ? (
+            <motion.form 
+              key="login"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handleLogin} 
+              className="space-y-4"
+            >
+              <div className="space-y-3">
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input 
-                      type="email" 
-                      placeholder="tucorreo@ejemplo.com" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                    type="email" 
+                    placeholder="Correo electrónico" 
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
                   />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input 
-                      type="password" 
-                      placeholder="Contraseña" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={6}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                    type="password" 
+                    placeholder="Contraseña" 
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
                   />
                 </div>
-            </div>
-            <Button 
+              </div>
+              <Button 
                 type="submit" 
                 disabled={loading}
                 className="w-full py-6 rounded-xl bg-black hover:bg-gray-800 text-white font-medium shadow-md"
+              >
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Iniciar Sesión"}
+              </Button>
+            </motion.form>
+          ) : (
+            <motion.form 
+              key="signup"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handleSignup} 
+              className="space-y-4"
             >
-                {loading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  isSignUp ? "Crear Cuenta" : "Iniciar Sesión"
-                )}
-            </Button>
-        </form>
-
-        <div className="flex justify-between items-center text-sm">
-          <button 
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-aurora-cyan hover:underline font-medium"
-          >
-            {isSignUp ? "Ya tengo cuenta" : "Crear cuenta nueva"}
-          </button>
-          <button 
-            type="button"
-            onClick={handleMagicLink}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Usar Magic Link
-          </button>
-        </div>
+              <div className="space-y-3">
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Nombre completo" 
+                    value={signupName}
+                    onChange={(e) => setSignupName(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                  />
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input 
+                    type="email" 
+                    placeholder="Correo electrónico" 
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                  />
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input 
+                    type="email" 
+                    placeholder="Confirmar correo electrónico" 
+                    value={signupEmailConfirm}
+                    onChange={(e) => setSignupEmailConfirm(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input 
+                    type="password" 
+                    placeholder="Contraseña (mínimo 6 caracteres)" 
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-cyan/50 backdrop-blur-sm transition-all"
+                  />
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full py-6 rounded-xl bg-black hover:bg-gray-800 text-white font-medium shadow-md"
+              >
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Crear Cuenta"}
+              </Button>
+            </motion.form>
+          )}
+        </AnimatePresence>
 
         <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -175,6 +274,7 @@ export default function LoginPage() {
         <Button 
             variant="outline"
             onClick={handleGoogleLogin}
+            disabled={loading}
             className="w-full py-6 rounded-xl border-gray-300 hover:bg-white/60 bg-white/40 flex items-center justify-center gap-3"
         >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -186,18 +286,27 @@ export default function LoginPage() {
             Continuar con Google
         </Button>
         
-        {message.text && (
-             <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`p-3 rounded-lg text-center text-sm font-medium ${
-                  message.type === 'error' 
-                    ? 'bg-red-100 text-red-700' 
-                    : 'bg-aurora-cyan/20 text-gray-800'
-                }`}
-            >
-                {message.text}
-            </motion.div>
+        {/* Error Message */}
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-lg bg-red-100 text-red-700 text-center text-sm font-medium flex items-center justify-center gap-2"
+          >
+            <AlertCircle className="h-4 w-4" />
+            {error}
+          </motion.div>
+        )}
+        
+        {/* Success Message */}
+        {success && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-lg bg-green-100 text-green-700 text-center text-sm font-medium"
+          >
+            {success}
+          </motion.div>
         )}
       </motion.div>
     </main>
