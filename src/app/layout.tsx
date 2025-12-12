@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   title: "OASIS Digital Portal",
   description: "Salud Mental y Resiliencia - Fundación Summer",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [{ url: '/favicon.png', type: 'image/png' }],
+    shortcut: ['/favicon.png'],
+    apple: ['/favicon.png'],
   },
 };
 
