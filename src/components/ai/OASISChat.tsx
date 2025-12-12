@@ -17,8 +17,8 @@ export function OASISChat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/chat",
     body: { mode },
-    onError: (error: Error) => {
-        console.error("Chatbot Error:", error);
+    onError: (e: Error) => {
+        console.error("Chatbot Error:", e);
     },
   } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
