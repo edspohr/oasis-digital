@@ -14,11 +14,11 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/chat",
     body: { mode },
     onError: (error: Error) => {
-        alert("Error del Chatbot: " + error.message + ". Verifica que la API Key esté configurada en Vercel.");
+        console.error("Chatbot Error:", error);
     },
   } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -136,6 +136,12 @@ export function OASISChat() {
                         </div>
                     )}
                 </div>
+                {error && (
+                    <div className="mx-4 mt-2 mb-4 p-3 bg-red-50 text-red-600 text-xs rounded-lg border border-red-100 flex items-start gap-2">
+                        <span className="shrink-0">⚠️</span>
+                        <span>{error.message || "Ocurrió un error. Intenta de nuevo."}</span>
+                    </div>
+                )}
             </ScrollArea>
 
             {/* Input */}
