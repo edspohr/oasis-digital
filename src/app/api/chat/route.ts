@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   try {
       const result = await streamText({
-        model: google("gemini-1.5-flash"), // Using 1.5-flash as 2.5 is not yet standard, assuming typo or future-proofing request
+        model: google("gemini-2.5-flash"), 
         system: systemPrompt,
         messages,
       });
