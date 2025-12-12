@@ -17,6 +17,9 @@ export function OASISChat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: "/api/chat",
     body: { mode },
+    onError: (error: Error) => {
+        alert("Error del Chatbot: " + error.message + ". Verifica que la API Key esté configurada en Vercel.");
+    },
   } as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   const scrollRef = useRef<HTMLDivElement>(null);
