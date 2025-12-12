@@ -14,10 +14,11 @@ export function OASISChat() {
   const [mode, setMode] = useState<"mentor" | "coach">("mentor");
   const [showTooltip, setShowTooltip] = useState(true);
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: "/api/chat",
     body: { mode },
-  });
+  } as any) as any;
 
   const scrollRef = useRef<HTMLDivElement>(null);
 

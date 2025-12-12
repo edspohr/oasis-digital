@@ -177,8 +177,11 @@ export default function LoginPage() {
          className="glass w-full max-w-md p-8 rounded-3xl shadow-xl flex flex-col gap-6"
       >
         <div className="text-center space-y-2">
+import Image from "next/image";
+
+// ... inside component ...
             <div className="flex justify-center mb-2">
-                <img src="/favicon.png" alt="OASIS Logo" className="h-20 w-auto" />
+                <Image src="/favicon.png" alt="OASIS Logo" width={80} height={80} className="h-20 w-auto" priority />
             </div>
             <h1 className="font-heading font-bold text-3xl text-gray-800">OASIS Digital</h1>
             <p className="text-sm text-gray-600">Salud Mental y Resiliencia</p>
