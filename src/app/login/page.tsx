@@ -105,14 +105,29 @@ export default function LoginPage() {
     }
     
     if (data.user) {
-      // Try auto-login
+      // Check if email confirmation is required
+      if (data.user.identities && data.user.identities.length === 0) {
+        // User already exists but hasn't confirmed email
+        setError("Este correo ya está registrado. Revisa tu bandeja de entrada o usa 'Olvidé mi contraseña'.");
+        setLoading(false);
+        return;
+      }
+      
+      // If user has a session, they're logged in
+      if (data.session) {
+        router.push("/participant");
+        return;
+      }
+      
+      // Try auto-login (works when email confirmation is disabled)
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: signupEmail,
         password: signupPassword,
       });
       
       if (signInError) {
-        setSuccess("¡Cuenta creada! Inicia sesión para continuar.");
+        // Email confirmation is likely required
+        setSuccess("¡Cuenta creada! Revisa tu correo para confirmar o inicia sesión.");
         setActiveTab("login");
         setLoginEmail(signupEmail);
       } else {
@@ -163,7 +178,7 @@ export default function LoginPage() {
       >
         <div className="text-center space-y-2">
             <h1 className="font-heading font-bold text-3xl text-gray-800">OASIS Digital</h1>
-            <p className="text-sm text-gray-600">Tu refugio digital de bienestar</p>
+            <p className="text-sm text-gray-600">Salud Mental y Resiliencia</p>
         </div>
 
         {activeTab !== "recovery" ? (
