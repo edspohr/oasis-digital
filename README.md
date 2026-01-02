@@ -34,3 +34,22 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Project Architecture
+
+The project follows a 3-layer architecture to separate concerns and facilitate collaboration:
+
+```
+src/
+├── app/ (Router)
+├── frontend/
+│   ├── actions/
+│   ├── components/
+│   └── hooks/
+├── middleware/
+│   └── connectors/
+├── backend/
+│   ├── auth/ (Orchestrators)
+│   └── supabase/ (DB Client)
+└── middleware.ts (Next.js config file - distinct from middleware folder)
+```
