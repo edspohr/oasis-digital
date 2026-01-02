@@ -1,4 +1,4 @@
-import { AdminDashboardMetrics } from "@/components/admin/AdminMetrics";
+import { AdminDashboardMetrics } from "@/frontend/components/admin/AdminMetrics";
 
 export default function AdminDashboard() {
     return (

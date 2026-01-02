@@ -1,4 +1,4 @@
-import { EventManager } from "@/components/admin/EventManager";
+import { EventManager } from "@/frontend/components/admin/EventManager";
 
 export default function AdminEventsPage() {
     return (

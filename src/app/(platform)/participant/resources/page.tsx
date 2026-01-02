@@ -1,7 +1,7 @@
 "use client";
 
-import { ResourceCard } from "@/components/participant/ResourceCard";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ResourceCard } from "@/frontend/components/participant/ResourceCard";
+import { ScrollArea, ScrollBar } from "@/frontend/components/ui/scroll-area";
 
 export default function ResourcesPage() {
     const resources = [

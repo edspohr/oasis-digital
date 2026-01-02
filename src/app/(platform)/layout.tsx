@@ -1,8 +1,8 @@
 "use client";
 
-import { Sidebar } from "@/components/dashboard/Sidebar";
-import { BackgroundWaves } from "@/components/visuals/BackgroundWaves";
-import { OASISChat } from "@/components/ai/OASISChat";
+import { Sidebar } from "@/frontend/components/dashboard/Sidebar";
+import { BackgroundWaves } from "@/frontend/components/visuals/BackgroundWaves";
+import { OASISChat } from "@/frontend/components/ai/OASISChat";
 
 export default function PlatformLayout({
   children,

@@ -1,4 +1,4 @@
-import { ContentCMS } from "@/components/admin/ContentCMS";
+import { ContentCMS } from "@/frontend/components/admin/ContentCMS";
 
 export default function AdminCMSPage() {
     return (

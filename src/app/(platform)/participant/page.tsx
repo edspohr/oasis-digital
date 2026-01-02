@@ -1,4 +1,4 @@
-import { Timeline } from "@/components/participant/Timeline";
+import { Timeline } from "@/frontend/components/participant/Timeline";
 
 export default function ParticipantHome() {
     return (

@@ -1,4 +1,4 @@
-import { ParticipantCRM } from "@/components/admin/ParticipantCRM";
+import { ParticipantCRM } from "@/frontend/components/admin/ParticipantCRM";
 
 export default function AdminCRMPage() {
     return (
