@@ -82,13 +82,7 @@ export function Timeline() {
    * Verifica si existe un formulario configurado para el paso seleccionado.
    */
   const handleStepClick = (stepId: string) => {
-    const formId = SURVEY_MAP[stepId];
-
-    if (!formId) {
-      console.warn(`[Timeline] No se encontró configuración de formulario para el paso ID: ${stepId}`);
-      return;
-    }
-
+    // Open modal for any step click
     setActiveStepId(stepId);
   };
 
@@ -120,7 +114,7 @@ export function Timeline() {
 
         {steps.map((step) => {
           const hasSurveyConfigured = !!SURVEY_MAP[step.id];
-          const isInteractable = hasSurveyConfigured && step.status === "current";
+          const isInteractable = true; // Allow interaction with all steps for the demo modal requirement 
 
           return (
             <div key={step.id} className="relative flex items-start gap-4 group">
@@ -137,7 +131,7 @@ export function Timeline() {
 
               {/* Tarjeta de Contenido */}
               <div
-                onClick={() => isInteractable && handleStepClick(step.id)}
+                onClick={() => handleStepClick(step.id)}
                 className={cn(
                   "flex-1 rounded-2xl p-4 transition-all duration-300 border border-transparent",
                   step.status === "current"

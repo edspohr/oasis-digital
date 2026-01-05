@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -80,14 +80,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  
+
   /* Aurora Theme Colors */
   /* Cyan/Celeste (Top) */
-  --aurora-cyan: oklch(0.9 0.1 200); 
+  --aurora-cyan: oklch(0.9 0.1 200);
   /* Pink Pastel (Middle) */
   --aurora-pink: oklch(0.85 0.1 330);
   /* Yellow Warm (Bottom) */
   --aurora-yellow: oklch(0.9 0.1 80);
+
+  /* Neon Accents */
+  --neon-fuchsia: #ff007f; /* Hot Pink matched from image */
+  --neon-yellow: #dfff00; /* Chartreuse Yellow matched from image */
 }
 
 @utility glass {
