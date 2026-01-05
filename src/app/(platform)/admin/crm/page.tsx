@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { getContacts, Contact } from '@/frontend/actions/crm.actions';
 import { ContactTable } from '@/frontend/components/crm/ContactTable';
 import { Input } from '@/frontend/components/ui/input';
@@ -19,7 +19,7 @@ import {
 } from '@/frontend/components/ui/dialog';
 import { Label } from '@/frontend/components/ui/label';
 
-export default function CrmDashboardPage() {
+function CrmDashboardContent() {
     const { trackInteraction } = useUserActivity();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -107,5 +107,13 @@ export default function CrmDashboardPage() {
 
             <ContactTable contacts={filteredContacts} />
         </div>
+    );
+}
+
+export default function CrmDashboardPage() {
+    return (
+        <Suspense fallback={<div className="p-12 text-center text-gray-500">Cargando dashboard...</div>}>
+            <CrmDashboardContent />
+        </Suspense>
     );
 }

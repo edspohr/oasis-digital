@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { getContacts, Contact } from '@/frontend/actions/crm.actions';
 import { ContactTable } from '@/frontend/components/crm/ContactTable';
 import { Input } from '@/frontend/components/ui/input';
@@ -8,7 +8,7 @@ import { Button } from '@/frontend/components/ui/button';
 import { Plus, Search, Filter } from 'lucide-react';
 import { useUserActivity } from '@/frontend/hooks/useUserActivity';
 
-export default function ContactsPage() {
+function ContactsContent() {
     const { trackInteraction } = useUserActivity();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -57,5 +57,13 @@ export default function ContactsPage() {
 
             <ContactTable contacts={filteredContacts} />
         </div>
+    );
+}
+
+export default function ContactsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Cargando directorio...</div>}>
+            <ContactsContent />
+        </Suspense>
     );
 }
