@@ -7,6 +7,12 @@ import { Badge } from '@/frontend/components/ui/badge';
 import { Button } from '@/frontend/components/ui/button';
 import { Calendar, Users, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/frontend/components/ui/dropdown-menu";
 
 interface WorkshopCardProps {
     workshop: Workshop;
@@ -49,12 +55,37 @@ export const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop }) => {
                     />
                 </div>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50/50 dark:bg-zinc-900/50 p-4">
-                <Button className="w-full" asChild variant={isUpcoming ? "default" : "secondary"}>
+            <CardFooter className="border-t bg-gray-50/50 dark:bg-zinc-900/50 p-4 gap-2">
+                <Button className="flex-1" asChild variant={isUpcoming ? "default" : "secondary"}>
                     <Link href={`/admin/crm/workshops/${workshop.id}`}>
-                        {isUpcoming ? 'Gestionar Asistencia' : 'Ver Detalles'} <ArrowRight className="ml-2 h-4 w-4" />
+                        {isUpcoming ? 'Gestionar' : 'Ver Detalles'} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>
+
+                {/* Send to Calendar Button */}
+                {isUpcoming && (
+                    <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" title="Agendar en mi calendario">
+                                <Calendar className="h-4 w-4" />
+                            </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => {
+                                const startDate = new Date(workshop.date).toISOString().replace(/-|:|\.\d\d\d/g, "");
+                                const endDate = new Date(new Date(workshop.date).getTime() + 7200000).toISOString().replace(/-|:|\.\d\d\d/g, ""); // +2 hours
+                                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(workshop.title)}&details=${encodeURIComponent("Taller OASIS")}&dates=${startDate}/${endDate}`, '_blank');
+                            }}>
+                                Google Calendar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                                window.open(`https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(workshop.title)}&body=${encodeURIComponent("Taller OASIS")}&startdt=${workshop.date}`, '_blank');
+                            }}>
+                                Outlook Calendar
+                            </DropdownMenuItem>
+                         </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </CardFooter>
         </Card>
     );
