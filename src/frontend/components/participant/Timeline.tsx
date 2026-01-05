@@ -21,7 +21,7 @@ interface Step {
  * Utiliza variables de entorno para evitar exponer IDs sensibles en el código fuente.
  */
 const SURVEY_MAP: Record<string, string | undefined> = {
-  "1": process.env.NEXT_PUBLIC_TYPEFORM_SURVEY_INITIAL,
+  "1": "wsUJblKO", // Encuesta Inicial (Updated)
   "3": process.env.NEXT_PUBLIC_TYPEFORM_SURVEY_POST,
   "4": process.env.NEXT_PUBLIC_TYPEFORM_SURVEY_3M,
   "5": process.env.NEXT_PUBLIC_TYPEFORM_SURVEY_6M,
