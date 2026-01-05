@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { getWorkshops, Workshop } from '@/frontend/actions/crm.actions';
 import { WorkshopCard } from '@/frontend/components/crm/WorkshopCard';
 import { Button } from '@/frontend/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useUserActivity } from '@/frontend/hooks/useUserActivity';
 
-export default function WorkshopsPage() {
+function WorkshopsContent() {
     const { trackInteraction } = useUserActivity();
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
 
@@ -37,5 +37,13 @@ export default function WorkshopsPage() {
                 ))}
             </div>
         </div>
+    );
+}
+
+export default function WorkshopsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Cargando talleres...</div>}>
+            <WorkshopsContent />
+        </Suspense>
     );
 }
