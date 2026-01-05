@@ -39,7 +39,11 @@ export interface Workshop {
 const seedData = () => {
     if (typeof window === 'undefined') return;
     
-    if (!localStorage.getItem(CONTACTS_KEY)) {
+    const currentData = localStorage.getItem(CONTACTS_KEY);
+    let contacts: Contact[] = currentData ? JSON.parse(currentData) : [];
+
+    // If data is missing OR too small (force expansion for demo), generate more
+    if (contacts.length < 5) {
         // --- DATA GENERATOR ---
         const firstNames = ["Ana", "Carlos", "Sofia", "Miguel", "Valentina", "Javier", "Camila", "Andres", "Lucia", "Diego", "Maria", "Jose", "Fernanda", "Ricardo", "Isabella", "Daniel", "Paula", "Gabriel", "Elena", "Hugo"];
         const lastNames = ["Pérez", "Díaz", "Lagos", "Silva", "Rojas", "González", "Muñoz", "Castro", "Vargas", "Torres", "Fernandez", "Ramirez", "Soto", "Contreras", "Rodriguez", "Morales", "Herrera", "Sepulveda", "Fuentes", "Mendoza"];
@@ -81,27 +85,31 @@ const seedData = () => {
             });
         };
 
-        const initialContacts: Contact[] = generateContacts(50);
+        const newContacts: Contact[] = generateContacts(50);
         
-        // Ensure some key specific mock data exists
-        initialContacts.unshift({ 
-            id: uuidv4(), 
-            firstName: 'Ana', 
-            lastName: 'Pérez', 
-            email: 'ana.perez@techcorp.com', 
-            role: 'Gerente de RRHH',
-            organization: 'TechCorp',
-            phone: '+56 9 1234 5678',
-            tags: ['taller-verano', 'newsletter'], 
-            engagementScore: 85, 
-            joinedAt: new Date().toISOString(),
-            level: 'Embajador',
-            xp: 1250,
-            status: 'active',
-            lastSeen: new Date().toISOString()
-        });
+        // If it was empty, we add the fixed mock data too to ensure they exist
+        if (contacts.length === 0) {
+             newContacts.unshift({ 
+                id: uuidv4(), 
+                firstName: 'Ana', 
+                lastName: 'Pérez', 
+                email: 'ana.perez@techcorp.com', 
+                role: 'Gerente de RRHH',
+                organization: 'TechCorp',
+                phone: '+56 9 1234 5678',
+                tags: ['taller-verano', 'newsletter'], 
+                engagementScore: 85, 
+                joinedAt: new Date().toISOString(),
+                level: 'Embajador',
+                xp: 1250,
+                status: 'active',
+                lastSeen: new Date().toISOString()
+            });
+        }
 
-        localStorage.setItem(CONTACTS_KEY, JSON.stringify(initialContacts));
+        // Merge keeping existing ones
+        contacts = [...contacts, ...newContacts];
+        localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
     }
 
     if (!localStorage.getItem(WORKSHOPS_KEY)) {
