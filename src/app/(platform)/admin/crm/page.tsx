@@ -17,12 +17,25 @@ import {
     DialogTrigger,
     DialogFooter
 } from '@/frontend/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/frontend/components/ui/dropdown-menu";
+import { Badge } from "@/frontend/components/ui/badge";
 import { Label } from '@/frontend/components/ui/label';
 
 function CrmDashboardContent() {
     const { trackInteraction } = useUserActivity();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+    const [selectedStatus, setSelectedStatus] = useState<string[]>([]); // New
+    const [selectedTags, setSelectedTags] = useState<string[]>([]); // New
     const [isNewContactOpen, setIsNewContactOpen] = useState(false);
 
     useEffect(() => {
@@ -34,12 +47,21 @@ function CrmDashboardContent() {
         load();
     }, []);
 
-    const filteredContacts = contacts.filter(c => 
-        c.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (c.organization && c.organization.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    // Extract Unique Tags for Filter UI
+    const availableTags = Array.from(new Set(contacts.flatMap(c => c.tags))).slice(0, 10); // Limit to top 10 to avoid huge lists
+
+    const filteredContacts = contacts.filter(c => {
+        const matchesSearch = c.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (c.organization && c.organization.toLowerCase().includes(searchTerm.toLowerCase()));
+        
+        const matchesLevel = selectedLevels.length === 0 || selectedLevels.includes(c.level);
+        const matchesStatus = selectedStatus.length === 0 || selectedStatus.includes(c.status);
+        const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => c.tags.includes(tag)); // OR logic for tags, can be AND if preferred
+
+        return matchesSearch && matchesLevel && matchesStatus && matchesTags;
+    });
 
     const handleCreateContact = () => {
         // Here we would call createContact action
@@ -100,9 +122,97 @@ function CrmDashboardContent() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <Button variant="outline" size="icon" className="h-11 w-11">
-                    <Filter className="h-5 w-5" />
-                </Button>
+                
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className={(selectedLevels.length > 0 || selectedStatus.length > 0 || selectedTags.length > 0) ? "bg-blue-50 border-blue-200 text-blue-600 gap-2" : "gap-2"}>
+                            <Filter className="h-4 w-4" />
+                            <span>Filtros</span>
+                            {(selectedLevels.length + selectedStatus.length + selectedTags.length) > 0 && (
+                                <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]">
+                                    {selectedLevels.length + selectedStatus.length + selectedTags.length}
+                                </Badge>
+                            )}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 max-h-[400px] overflow-y-auto">
+                        
+                        {/* Filtro: Nivel */}
+                        <DropdownMenuLabel>Nivel OASIS</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {['Explorador', 'Activo', 'Embajador'].map((level) => (
+                            <DropdownMenuCheckboxItem
+                                key={level}
+                                checked={selectedLevels.includes(level)}
+                                onCheckedChange={(checked) => {
+                                    if (checked) {
+                                        setSelectedLevels([...selectedLevels, level]);
+                                    } else {
+                                        setSelectedLevels(selectedLevels.filter((l) => l !== level));
+                                    }
+                                }}
+                            >
+                                {level}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                        
+                        {/* Filtro: Estatus */}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Estatus</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {['active', 'inactive', 'lead'].map((status) => (
+                            <DropdownMenuCheckboxItem
+                                key={status}
+                                checked={selectedStatus.includes(status)}
+                                onCheckedChange={(checked) => {
+                                    if (checked) {
+                                        setSelectedStatus([...selectedStatus, status]);
+                                    } else {
+                                        setSelectedStatus(selectedStatus.filter((s) => s !== status));
+                                    }
+                                }}
+                            >
+                                {status === 'active' ? 'Activo' : status === 'inactive' ? 'Inactivo' : 'Prospecto (Lead)'}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+
+                        {/* Filtro: Etiquetas (Top 8 + Dynamic) */}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Etiquetas</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {availableTags.map((tag) => (
+                            <DropdownMenuCheckboxItem
+                                key={tag}
+                                checked={selectedTags.includes(tag)}
+                                onCheckedChange={(checked) => {
+                                    if (checked) {
+                                        setSelectedTags([...selectedTags, tag]);
+                                    } else {
+                                        setSelectedTags(selectedTags.filter((t) => t !== tag));
+                                    }
+                                }}
+                            >
+                                {tag}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+
+                        {(selectedLevels.length > 0 || selectedStatus.length > 0 || selectedTags.length > 0) && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                    className="justify-center text-center text-red-500 cursor-pointer focus:text-red-500"
+                                    onClick={() => {
+                                        setSelectedLevels([]);
+                                        setSelectedStatus([]);
+                                        setSelectedTags([]);
+                                    }}
+                                >
+                                    Limpiar Todos
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <ContactTable contacts={filteredContacts} />
