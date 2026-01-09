@@ -31,9 +31,9 @@ export function SupersetChart({ dashboardId }: { dashboardId: string }) {
   return (
     <div 
       ref={divRef} 
-      // Cambiamos aspect-video por una altura mínima (min-h-[700px])
-      className="glass w-full min-h-[700px] rounded-3xl overflow-hidden border border-white/20 shadow-2xl" 
-      style={{ height: 'calc(100vh - 250px)' }} // Esto hará que se adapte al tamaño de la pantalla
+      // Se agregaron los selectores [&>iframe] para forzar el tamaño del dashboard
+      className="glass w-full min-h-[700px] rounded-3xl overflow-hidden border border-white/20 shadow-2xl [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0" 
+      style={{ height: 'calc(100vh - 250px)' }} 
     />
   );
 }
