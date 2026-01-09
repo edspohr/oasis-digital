@@ -21,7 +21,7 @@ export function SupersetChart({ dashboardId }: { dashboardId: string }) {
         dashboardUiConfig: { 
             hideTitle: true, 
             hideChartControls: true,
-            hideTab: true,
+            hideTab: false, // Permitimos ver las pestañas que configuraste en Superset
             filters: { visible: false, expanded: false }
         },
       });
@@ -31,9 +31,12 @@ export function SupersetChart({ dashboardId }: { dashboardId: string }) {
   return (
     <div 
       ref={divRef} 
-      // Se agregaron los selectores [&>iframe] para forzar el tamaño del dashboard
-      className="glass w-full min-h-[700px] rounded-3xl overflow-hidden border border-white/20 shadow-2xl [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0" 
-      style={{ height: 'calc(100vh - 250px)' }} 
+      /* Eliminamos 'glass', 'rounded-3xl', 'border' y 'shadow-2xl' 
+         para que el iframe sea invisible y solo se vean los datos 
+         sobre las ondas de fondo de la app.
+      */
+      className="w-full min-h-[700px] overflow-hidden [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 [&>iframe]:bg-transparent" 
+      style={{ height: 'calc(100vh - 200px)' }} 
     />
   );
 }
